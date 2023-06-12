@@ -1,12 +1,14 @@
-package tech.claudioed.equipment;
+package tech.claudioed.domain.equipment;
 
 public class Location {
-
-  private String name;
+  private String code;
   public Location() {
   }
-  public String getName() {
-    return name;
+  public Location(String code) {
+    this.code = code;
+  }
+  public String getCode() {
+    return this.code;
   }
 
 }

@@ -1,4 +1,4 @@
-package tech.claudioed.infra;
+package tech.claudioed.infra.ce;
 
 public enum CExtensions {
 
@@ -10,12 +10,10 @@ public enum CExtensions {
   CExtensions(String name) {
     this.name = name;
   }
-  public String getName() {
+  public String extensionName() {
     return name;
   }
-
   public enum Audience {
-
     INTERNAL_BOUNDED_CONTEXT("internal-bounded-context"),
 
     EXTERNAL_BOUNDED_CONTEXT("external-bounded-context");
@@ -25,7 +23,7 @@ public enum CExtensions {
       this.name = name;
     }
 
-    public String getName() {
+    public String audienceName() {
       return name;
     }
 
@@ -41,7 +39,7 @@ public enum CExtensions {
       this.name = name;
     }
 
-    public String getName() {
+    public String eventContextName() {
       return name;
     }
 

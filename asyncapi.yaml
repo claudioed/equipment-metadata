@@ -1,0 +1,116 @@
+asyncapi: '2.6.0'
+info:
+  title: Equipment metadata collector APIs
+  version: '0.0.1'
+  description: |
+    The Smartylighting Streetlights API allows you to remotely manage the city lights.
+
+    ### Check out its awesome features:
+
+    * Turn a specific streetlight on/off 🌃
+    * Dim a specific streetlight 😎
+    * Receive real-time information about environmental lighting conditions 📈
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  mtls-connections:
+    url: test.mykafkacluster.org:28092
+    protocol: kafka-secure
+    description: Test broker secured with X509
+    security:
+      - certs: []
+    tags:
+      - name: "env:test-mtls"
+        description: "This environment is meant for running internal tests through mtls"
+      - name: "kind:remote"
+        description: "This server is a remote server. Not exposed by the application"
+      - name: "visibility:private"
+        description: "This resource is private and only available to certain users"
+
+defaultContentType: application/json
+
+channels:
+
+  equipment.metadata.streams.0.0.1.measurements:
+    description: The topic on which measured values may be produced and consumed.
+    subscribe:
+      summary: Inform measurement collected in equipment
+      operationId: notifyEquipmentMetadata
+      traits:
+        - $ref: '#/components/operationTraits/kafka'
+      message:
+        $ref: '#/components/messages/equipmentMetadataMeasured'
+
+components:
+
+  messages:
+    equipmentMetadataMeasured:
+      name: equipmentMetadataMeasured
+      title: EquipmentMetadataCollected
+      summary: Inform about equipment metadata measurements
+      contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/commonHeaders'
+      payload:
+        $ref: "#/components/schemas/metadataMeasured"
+
+  schemas:
+    metadataMeasured:
+      type: object
+      allOf:
+        - $ref: 'https://raw.githubusercontent.com/cloudevents/spec/v1.0.1/spec.json'
+      properties:
+        data:
+          $ref: '#/components/schemas/metadataCollected'
+    metadataCollected:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+            - on
+            - off
+          description: Whether to turn on or off the light.
+        sentAt:
+          $ref: "#/components/schemas/sentAt"
+
+    equipment:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        location:
+          $ref: "#/components/schemas/location"
+
+    location:
+      type: object
+      properties:
+        code:
+          type: string
+
+    sentAt:
+      type: string
+      format: date-time
+      description: Date and time when the message was sent.
+
+  messageTraits:
+    commonHeaders:
+      headers:
+        type: object
+        properties:
+          my-app-header:
+            type: integer
+            minimum: 0
+            maximum: 100
+
+  operationTraits:
+    kafka:
+      bindings:
+        kafka:
+          clientId:
+            type: string
+            enum: ['my-app-id']
